@@ -1,14 +1,10 @@
 # Introduction to Ansible
 Intention for this repository is to provide an introduction to Ansible while also providing a usable base structure with examples.  
 
-<<<<<<< HEAD
 :warning: WARNING
 :-
 The examples are tested on a `Debian` based System.  
 Be aware of possible differences on other Systems.
-=======
-[[_TOC_]]
->>>>>>> refs/remotes/origin/main
 
 
 ## Table of Content
