@@ -1,5 +1,6 @@
 # Introduction to Ansible
 Intention for this repository is to provide a basic introduction to Ansible while also providing a usable base structure with examples.  
+The goal is not to cover anything and everything Ansible is capable of but enough to make practical use of it
 
 :warning: WARNING
 :-
@@ -26,11 +27,11 @@ Be aware of possible differences on other Systems.
 - [Vault](#vault)
 
 
-
-
-
 ## What is Ansible?
-[Documentation](https://docs.ansible.com/)
+Ansible is an IT automation tool. It can be used to Configure and Deploy Systems and Software.  
+Through `SSH` it connects to Systems and Devices and manages them based on `YAML` and `Python` Code.  
+Because of this Ansible is essentially agent-less. The target Systems only need to be able to accept SSH connections (e.g. openssh-server).  
+It also has decent [Documentation](https://docs.ansible.com/ansible/latest/).
 
 
 ## Installation
@@ -46,12 +47,23 @@ Also, **new features**.
 
 
 ### Directory structure
+There are many ways in how to build the directory structure for Ansible.  
+You can find additional examples [here](https://docs.ansible.com/ansible/latest/tips_tricks/sample_setup.html).  
+The structure within this repository is just what worked best for me.
+
+- In the base directory is the Ansible Configuration file `ansible.cfg` and the so-called playbooks `*.yml`/`*.yaml` (more later).
+- The `inventories` directory contains one or multiple inventory files (all files are read automatically) that contain hosts that can be combined by groups.
+- `host_vars` and `group_vars` can contain files named after hots or groups as they are defined in the inventories, they are matched automatically.
+- In the `roles` directory are multiple roles that each contain individual tasks and generic files, variables etc. to fulfill those tasks.
+- The `files` directory is not Ansible related, I just found it useful to have a separate directory for files that I want to copy to multiple target Systems (e.g. public SSH-Keys).
+
+It is possible to have an own directory for the `playbooks` but you would have to define the path for the roles in the `ansible.cfg` using `roles_path`, because Ansible assumes that `roles` are stored in a sub-directory where the playbooks are.
 
 
 ### SSH Configuration
 Ansible is capable of reading the `~/.ssh/config`.  
 Through this you con't have to manage any `hosts` file.  
-Just add the Systems that you would like to mange with ansible into the configuration like:
+Just add the Systems that you would like to mange with Ansible into the configuration like:
 ```bash
 Host sample1
   HostName target-server.com
@@ -72,6 +84,9 @@ Host *
   SendEnv LANG LC_*
   Compression yes
 ```
+It is recommended to avoid always reusing the same SSH-Key and also having one without passphrase.  
+If having individual SSH-Keys and passphrases for each System is too tedious consider having one SSH-Key for a group of Systems or one for each customer or whatever fits your infrastructure and requirements.
+
 Here are some great talks about SSH and how it can be used in a good way:  
 [Talk about SSH by Leyrer Part1 (german)](https://media.ccc.de/v/gpn20-8-besser-leben-mit-ssh)  
 [Talk about SSH by Leyrer Part2 (german)](https://media.ccc.de/v/gpn21-28-noch-besser-leben-mit-ssh#t=829)
@@ -112,7 +127,14 @@ Now you can place files inside of that directory as `<filename>.bashrc`, but you
 chmod +x ~/.bashrc.d/*.bashrc
 ```
 
+Now you can load the public key into your SSH-Agent which requires you to only enter the passphrase ones for as long as the terminal session is open.
+```bash
+ssh-add ~/.ssh/key_file_name
+```
+
 #### TPM 2.0
+It is possible to have SSH-keys in the TPM 2.0 Chip, but I haven't used that yet.  
+It is well explained here:
 [Talk about SSH by Leyrer Part2 (german)](https://media.ccc.de/v/gpn21-28-noch-besser-leben-mit-ssh#t=829)
 
 
@@ -139,9 +161,31 @@ Start-Service sshd
 Set-Service -Name sshd -StartupType 'Automatic'
 ```
 
+After the OpenSSh Server is installed add the SSH-Keys from the System where Ansible will be run from to the target System.
+```bash
+# From Ansible System
+ssh-copy-id -i ~/.ssh/key_file_name <target_system>
+```
+Also consider disabling the option to allow login via SSH using Password (after you made sure login via SSH-Key works):
+```bash
+#/etc/ssh/sshd_config
+PasswordAuthentication no
+```
+```bash
+systemctl restart sshd
+```
+
 
 ### Ansible Configuration Settings
-https://docs.ansible.com/ansible/latest/reference_appendices/config.html
+https://docs.ansible.com/ansible/latest/reference_appendices/config.html  
+The `ansible.cfg` allows you to configure Ansible to your needs.
+E.g.:  
+- add log directory
+- change directories for playbooks, inventories, etc.
+- set defaults
+- ...
+
+
 
 To generate a fully commented-out example `ansible.cfg` run:
 ```bash
@@ -156,11 +200,12 @@ ansible-config init --disabled -t all > ansible.cfg
 
 ### Test
 Download this repository and switch into its directory.  
-Run the first example:
+Run the first example (Connections to localhost don't require SSH):
 ```bash
 ansible-playbook example_01.yml
 ```
-Connections to localhost don't require SSH
+![Test Run](./docs/test_run.png)
+
 
 
 
@@ -176,6 +221,7 @@ suffix or prefix like `prod_` and `staging_`
 
 ## Vars
 
+[Variable Precedence](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence)
 [Special Variables](https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html)
 
 ## Collections
