@@ -1,0 +1,44 @@
+---
+all:
+  children:
+    internal:
+      children:
+        ansible_vm:
+          hosts:
+            localhost:
+              ansible_connection: local
+
+        linux_all:
+          children:
+            linux_clients:
+              hosts:
+                client1:
+            linux_servers:
+              hosts:
+                server1:
+              children:
+                docker_host:
+                  hosts:
+                    docker_linux:
+
+        windows_all:
+          children:
+            windows_clients:
+              hosts:
+                client1:
+            windows_servers:
+              hosts:
+                server1:
+              children:
+                docker_host:
+                  hosts:
+                    docker_windows:
+
+    external:
+      hosts:
+        github.com:
+          ansible_host: github.com
+          ansible_user: git
+          ansible_port: 22
+          ansible_ssh_private_key_file: ~/.ssh/<your_ssh_key>
+...

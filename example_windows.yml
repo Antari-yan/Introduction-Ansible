@@ -1,0 +1,9 @@
+---
+- name: Configure Windows Host
+  hosts: windows_clients
+
+  vars:
+    ansible_connection: ssh
+    ansible_port: 22
+    ansible_shell_type: cmd
+...

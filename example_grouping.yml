@@ -1,0 +1,12 @@
+---
+- name: Host Grouping
+  hosts: docker_host
+  become: false
+  gather_facts: false
+
+  tasks:
+    - name: Show hostname in inventory
+      debug:
+        msg:
+          - "{{ inventory_hostname }}"
+...

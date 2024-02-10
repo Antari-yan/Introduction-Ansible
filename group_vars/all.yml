@@ -1,0 +1,10 @@
+---
+
+multiline_example: >-
+  this
+  is
+  a
+  multiline
+  variable
+
+...

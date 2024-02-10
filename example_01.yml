@@ -1,0 +1,13 @@
+---
+- name: Examples
+  hosts: ansible_vm
+  become: false
+  gather_facts: false
+
+  tasks:
+    - name: test
+      debug:
+        msg:
+          - "{{ inventory_hostname }}"
+          - "{{ lookup('env', 'USER') }}"
+...
