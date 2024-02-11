@@ -17,7 +17,7 @@ all:
               hosts:
                 client1:
                 client2:
-            linux_servers:
+            linux_server:
               hosts:
                 server1:
               children:
@@ -33,7 +33,7 @@ all:
             windows_clients:
               hosts:
                 client1:
-            windows_servers:
+            windows_server:
               hosts:
                 server1:
               children:
