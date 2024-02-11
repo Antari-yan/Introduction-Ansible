@@ -7,12 +7,16 @@ all:
           hosts:
             localhost:
               ansible_connection: local
+              host_test_var: test
+          vars:
+            group_test_var: test
 
         linux_all:
           children:
             linux_clients:
               hosts:
                 client1:
+                client2:
             linux_servers:
               hosts:
                 server1:
@@ -20,6 +24,9 @@ all:
                 docker_host:
                   hosts:
                     docker_linux:
+                webservers:
+                  hosts:
+                    www[01:50:2].example.com:
 
         windows_all:
           children:
@@ -41,4 +48,7 @@ all:
           ansible_user: git
           ansible_port: 22
           ansible_ssh_private_key_file: ~/.ssh/<your_ssh_key>
+
+hosts:
+  ungrouped_host:
 ...
