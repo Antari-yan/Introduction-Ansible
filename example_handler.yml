@@ -1,0 +1,33 @@
+---
+- name: Examples
+  hosts: ansible_vm
+  become: false
+  gather_facts: false
+
+  tasks:
+    - name: Changed task
+      ansible.builtin.debug:
+        msg:
+          - "I am changed and thus can notify a handler to run"
+      changed_when: true
+      notify: Handler 1
+
+    - name: Changed task
+      ansible.builtin.debug:
+        msg:
+          - "I am changed and thus can notify a handler to run"
+      changed_when: true
+      notify:
+        - Handler 1
+        - Handler 2
+
+  handlers:
+    - name: Handler 1
+      ansible.builtin.debug:
+        msg:
+          - "I am a handler only run when notified by a task with state changed"
+    - name: Handler 2
+      ansible.builtin.debug:
+        msg:
+          - "I am another handler only run when notified by a task with state changed"
+...

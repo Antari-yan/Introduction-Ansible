@@ -6,7 +6,7 @@
 
   tasks:
     - name: test
-      debug:
+      ansible.builtin.debug:
         msg:
           - "Hello, I am running on {{ inventory_hostname }}!"
 ...

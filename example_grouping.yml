@@ -6,7 +6,7 @@
 
   tasks:
     - name: Show hostname in inventory
-      debug:
+      ansible.builtin.debug:
         msg:
           - "{{ inventory_hostname }}"
 ...

@@ -1,6 +1,6 @@
 ---
 - name: Host Grouping
-  hosts: linux_server !webservers !docker_host
+  hosts: "*_server"
   become: false
   gather_facts: false
 
