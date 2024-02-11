@@ -1,0 +1,12 @@
+---
+- name: Host Grouping
+  hosts: linux_server !webservers
+  become: false
+  gather_facts: false
+
+  tasks:
+    - name: Show hostname in inventory
+      debug:
+        msg:
+          - "{{ inventory_hostname }}"
+...
