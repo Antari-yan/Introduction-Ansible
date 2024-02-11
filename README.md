@@ -1,6 +1,7 @@
 # Introduction to Ansible
 :warning: WARNING
-:-WiP
+:-
+WiP
 
 
 Intention for this repository is to provide a basic introduction to Ansible while also providing a usable base structure with examples.  
