@@ -1,7 +1,6 @@
 # Introduction to Ansible
-:warning: WARNING
+:warning: WiP
 :-
-WiP
 
 
 Intention for this repository is to provide a basic introduction to Ansible while also providing a usable base structure with examples.  
@@ -26,10 +25,10 @@ Be aware of possible differences on other Systems.
   - [Inventory](#inventory)
   - [Playbook](#playbook)
   - [Tasks](#tasks)
-    - [Collections](#collections)
-    - [Handlers](#handlers)
+  - [Handlers](#handlers)
   - [Roles](#roles)
   - [Vars](#vars)
+  - [Conditions and Loops](#conditions-and-loops)
   - [Jinja2 Templates](#jinja2-templates)
   - [Vault](#vault)
 - [Pull Mode](#pull-mode)
@@ -338,16 +337,21 @@ With `ansible-playbook --help` you can also check out its multiple additional op
 ---
 https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#term-Tasks
 
-A task is a singular action that should be run. It can be anything from a simple console command to disk formatting, network configuration and more.
+A task is a singular action that should be run. It can be anything from a simple console command, to disk formatting, network configuration and more. Every possible action is grouped in `namespace` and a [collection](https://docs.ansible.com/ansible/latest/collections/index.html) reaching from [builtin](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/index.html#plugins-in-ansible-builtin) to [community managed](https://docs.ansible.com/ansible/latest/collections/community/index.html).  
+There is also the [ansible-galaxy](https://galaxy.ansible.com/ui/) which contains even more collections outside of the official documentation.
 
-FQCN! https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#term-Fully-Qualified-Collection-Name-FQCN
+The `example_tasks.yml` file contains basic examples in how tasks are structured.
+```bash
+ansible-playbook example_tasks.ym
+```
+A task can additional to it's action contain where, when and with what privileges it should run and more.
 
-#### Collections
----
-https://docs.ansible.com/ansible/latest/collections/index.html
+Each task is at the end like a `Python` module defined in a `collection` within a `namespace`.  
+This is also known as [Fully Qualified Collection Name (FQCN)](https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#term-Fully-Qualified-Collection-Name-FQCN).  
+While it is possible to only use the `module` name (like `debug`) it is highly recommended to use the `FQCN` to ensure you don't accidentally run a `module` from a different `collection` or `namespace` that has the same name.
 
 
-#### Handlers
+### Handlers
 ---
 ```yaml
 - name: Update package cache
@@ -363,18 +367,23 @@ https://docs.ansible.com/ansible/latest/collections/index.html
         - handler2
 ```
 
-Only run once at the end
+Only run once at the end (of a role?, block?)
 
 ### Roles
 ---
 
 add a name when calling a role because Ansible otherwise may not run a role if it has been defined a second time in the same playbook.
 
+There is also the [ansible-galaxy](https://galaxy.ansible.com/ui/) which contains even more roles.
+
 ### Vars
 ---
 
 [Variable Precedence](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence)  
 [Special Variables](https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html)
+
+### Conditions and Loops
+---
 
 ### Jinja2 Templates
 ---
