@@ -1,0 +1,24 @@
+---
+- name: Task examples
+  hosts: ansible_vm
+  become: false
+  gather_facts: false
+
+  tasks:
+    - name: Basic task
+      ansible.builtin.debug:
+        msg:
+          - "I am a task"
+
+    - name: Task redirected to specific host
+      ansible.builtin.debug:
+        msg:
+          - "I am a task running specifically on localhost"
+      delegate_to: localhost
+
+    - name: Task with previlege escalation
+      ansible.builtin.debug:
+        msg:
+          - "I am running with previlege escalation"
+      become: true
+...
