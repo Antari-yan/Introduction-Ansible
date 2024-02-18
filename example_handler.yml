@@ -12,6 +12,9 @@
       changed_when: true
       notify: Handler 1
 
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+
     - name: Changed task
       ansible.builtin.debug:
         msg:
@@ -20,6 +23,9 @@
       notify:
         - Handler 1
         - Handler 2
+
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
 
   handlers:
     - name: Handler 1

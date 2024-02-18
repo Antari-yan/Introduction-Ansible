@@ -29,9 +29,12 @@ Be aware of possible differences on other Systems.
   - [Roles](#roles)
   - [Vars](#vars)
   - [Conditions and Loops](#conditions-and-loops)
+  - [Grouping and Error handling](#grouping-and-error-handling)
   - [Jinja2 Templates](#jinja2-templates)
   - [Vault](#vault)
-- [Pull Mode](#pull-mode)
+- [Extras](#extras)
+  - [Pull Mode](#pull-mode)
+  - [Execution Environment](#execution-environment)
 
 
 ## What is Ansible?
@@ -190,7 +193,7 @@ systemctl restart sshd
 
 ### Ansible Configuration Settings
 ---
-https://docs.ansible.com/ansible/latest/reference_appendices/config.html  
+[List of settings](https://docs.ansible.com/ansible/latest/reference_appendices/config.html)  
 The `ansible.cfg` allows you to configure Ansible to your needs.
 E.g.:  
 - add log directory
@@ -228,7 +231,7 @@ ansible-playbook example_01.yml
 
 ### Inventory
 ---
-https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html
+[Inventory building](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html)
 
 The inventory which contains a structure of your host, groups and if desired variables and connection settings can be built in multiple ways.
 The most common ones are either as `YAML` or `ini`.
@@ -261,7 +264,7 @@ hosts:
 When running a `playbook` you can specify with `-i <path>` which inventory should be used.
 With my configuration any `YAML` or `ini` will be automatically loaded from the `inventory/` directory.
 
-When building your inventory be careful with naming a group, because groups with the same name will be grouped together when called directly.  
+When building your inventory be careful with naming a group, because groups with the same name will be grouped together when called directly. Whis is also known as `metagroup`  
 This can be seen when running the following example:
 ```bash
 ansible-playbook example_grouping.yml
@@ -269,14 +272,48 @@ ansible-playbook example_grouping.yml
 In the recap you will see two host because both are in the sub-group `docker_host` even though they are in separate different sub-groups.  
 Because of this I recommend using unique names for a group like adding a suffix or prefix to the name of the parent group or something like `prod_` and `staging_`.
 
+But you can also use this function to build your inventory like this:
+```yaml
+leafs:
+  hosts:
+    leaf01:
+      ansible_host: 192.0.2.100
+    leaf02:
+      ansible_host: 192.0.2.110
+
+spines:
+  hosts:
+    spine01:
+      ansible_host: 192.0.2.120
+    spine02:
+      ansible_host: 192.0.2.130
+
+network:
+  children:
+    leafs:
+    spines:
+
+webservers:
+  hosts:
+    webserver01:
+      ansible_host: 192.0.2.140
+    webserver02:
+      ansible_host: 192.0.2.150
+
+datacenter:
+  children:
+    network:
+    webservers:
+```
+This example contains a metagroup `network` that includes all network devices and a metagroup `datacenter` that includes the `network` and `webservers` groups.
+
 
 ### Playbook
 ---
-https://docs.ansible.com/ansible/latest/playbook_guide/index.html  
-https://github.com/ansible/ansible-examples
+[Playbook guide](https://docs.ansible.com/ansible/latest/playbook_guide/index.html)  
+[Official examples](https://github.com/ansible/ansible-examples)
 
-https://docs.ansible.com/ansible/latest/reference_appendices/playbooks_keywords.html
-
+[List of playbook keywords](https://docs.ansible.com/ansible/latest/reference_appendices/playbooks_keywords.html)
 
 A `playbook` is the starting point similar a setup script that is executed.  
 In a `playbook` you define a `group` from the inventory which will be targeted by its content, using the `hosts` variable.
@@ -335,8 +372,6 @@ With `ansible-playbook --help` you can also check out its multiple additional op
 
 ### Tasks
 ---
-https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#term-Tasks
-
 A task is a singular action that should be run. It can be anything from a simple console command, to disk formatting, network configuration and more. Every possible action is grouped in `namespace` and a [collection](https://docs.ansible.com/ansible/latest/collections/index.html) reaching from [builtin](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/index.html#plugins-in-ansible-builtin) to [community managed](https://docs.ansible.com/ansible/latest/collections/community/index.html).  
 There is also the [ansible-galaxy](https://galaxy.ansible.com/ui/) which contains even more collections outside of the official documentation.
 
@@ -353,6 +388,7 @@ While it is possible to only use the `module` name (like `debug`) it is highly r
 
 ### Handlers
 ---
+[Handlers guide](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html)
 ```yaml
 - name: Update package cache
   ansible.builtin.package:
@@ -367,7 +403,50 @@ While it is possible to only use the `module` name (like `debug`) it is highly r
         - handler2
 ```
 
-Only run once at the end (of a role?, block?)
+Important:
+Handlers are run in the order they are defined in the `handlers` section and not in the order of the `notify` section.  
+handlers can have utilize the keyword `listen` so that multiple handlers can be grouped together.
+```yaml
+tasks:
+  - name: Restart everything
+    command: echo "this task will restart the web services"
+    notify: "restart web services"
+
+handlers:
+  - name: Restart memcached
+    service:
+      name: memcached
+      state: restarted
+    listen: "restart web services"
+
+  - name: Restart apache
+    service:
+      name: apache
+      state: restarted
+    listen: "restart web services"
+```
+
+By default, handlers run after all the tasks in a particular play have been completed. Notified handlers are executed automatically after each of the following sections, in the following order: pre_tasks, roles/tasks and post_tasks. This approach is efficient, because the handler only runs once, regardless of how many tasks notify it. For example, if multiple tasks update a configuration file and notify a handler to restart Apache, Ansible only bounces Apache once to avoid unnecessary restarts.
+If you need handlers to run before the end of the play, add a task to flush them using the meta module, which executes Ansible actions:
+```yaml
+tasks:
+  - name: Some tasks go here
+    ansible.builtin.shell: ...
+
+  - name: Flush handlers
+    ansible.builtin.meta: flush_handlers
+
+  - name: Some other tasks
+    ansible.builtin.shell: ...
+```
+The meta: flush_handlers task triggers any handlers that have been notified at that point in the play.
+
+Once handlers are executed, either automatically after each mentioned section or manually by the flush_handlers meta task, they can be notified and run again in later sections of the play.
+
+Handlers from roles are not just contained in their roles but rather inserted into the global scope with all other handlers from a play. As such they can be used outside of the role they are defined in. It also means that their name can conflict with handlers from outside the role. To ensure that a handler from a role is notified as opposed to one from outside the role with the same name, notify the handler by using its name in the following form: role_name : handler_name.
+
+Handlers notified within the roles section are automatically flushed at the end of the tasks section but before any tasks handlers.
+
 
 ### Roles
 ---
@@ -380,18 +459,34 @@ There is also the [ansible-galaxy](https://galaxy.ansible.com/ui/) which contain
 ---
 
 [Variable Precedence](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence)  
+[Variable merging](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/meta_module.html)  
+[Facts and magic variables](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_vars_facts.html)  
+[Custom Facts](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_vars_facts.html#facts-d-or-local-facts)   
 [Special Variables](https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html)
 
 ### Conditions and Loops
 ---
 
+### Grouping and Error handling
+---
+[Block guide](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_blocks.html)
+
+
 ### Jinja2 Templates
 ---
+[Template testing with lookup](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_lookup.html)  
+[Template testing with python script](https://github.com/Antari-yan/python_jinja2_renderer)
 
 ### Vault
----
+<hr style="border:0,1px solid grey">
 
 
-## Pull mode
-https://docs.ansible.com/ansible/latest/cli/ansible-pull.html  
-https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#term-Pull-Mode
+## Extras
+There are some additional tools provided by Ansible that may be of interest, but since I haven't used them yet, they will only be listed here.
+
+### Pull mode
+[ansible-pull](https://docs.ansible.com/ansible/latest/cli/ansible-pull.html)
+
+### Execution Environment
+[Containerized Execution Environments](https://ansible.readthedocs.io/en/latest/getting_started_ee/index.html)  
+[Ansible Builder guide](https://ansible.readthedocs.io/projects/builder/en/latest/)

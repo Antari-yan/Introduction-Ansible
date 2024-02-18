@@ -1,11 +1,9 @@
 ---
-- name: Examples
+- name: First Hello World example
   hosts: ansible_vm
-  become: false
-  gather_facts: false
 
   tasks:
-    - name: test
+    - name: Echo like hello world
       ansible.builtin.debug:
         msg:
           - "Hello, I am running on {{ inventory_hostname }}!"
