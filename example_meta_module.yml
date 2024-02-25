@@ -1,0 +1,17 @@
+---
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/meta_module.html
+- name: Example Meta Module
+  hosts: ansible_vm
+  gather_facts: false
+
+  tasks:
+    - name: Refresh inventory to ensure new instances exist in inventory
+      ansible.builtin.meta: refresh_inventory
+
+    - name: Clear gathered facts from all currently targeted hosts
+      ansible.builtin.meta: clear_facts
+
+    # Outputs a warning only because the connection is `local` and not `ssh`
+    - name: Reset ssh connection to allow user changes to affect 'current login user'
+      ansible.builtin.meta: reset_connection
+...

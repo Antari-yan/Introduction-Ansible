@@ -1,0 +1,112 @@
+---
+- name: Vars examples
+  hosts: ansible_vm
+  become: false
+  gather_facts: true
+
+  vars:
+    int_var: 1
+    string_var: fuu
+    list_var_1: [ fuu, bar, 1 ]
+    list_var_2:
+      - fuu
+      - bar
+      - 1
+    dict_var_1: { name: fuu, number: 2 }
+    dict_var_2:
+      name: fuu
+      number: 1
+    list_dict:
+      - name: fuu
+        number: 3
+      - name: bar
+        number: 4
+    dict_list:
+      names:
+        - fuu
+        - bar
+      number: 5
+
+    num1: 10
+    num2: 20
+    name: Fuu Bar
+    number_list: [1,2,3,4,5,6,5,3,7,1,9]
+    path1: "/opt/custom/data/bin/script.sh"
+    path2: 'C:\Users\deeprasa\PycharmProjects\elasticsearch\test.log'
+    path3: "~/jinja2_temp_5.yml"
+
+  tasks:
+    - name: Show variables
+      ansible.builtin.debug:
+        msg:
+          - "{{ int_var }}"
+          - "{{ string_var }}"
+          - "{{ list_var_1 }}"
+          - "{{ list_var_2 }}"
+          - "{{ dict_var_1 }}"
+          - "{{ dict_var_2 }}"
+          - "{{ list_dict }}"
+          - "{{ dict_list }}"
+
+    - name: Show first entry of a list
+      ansible.builtin.debug:
+        msg:
+          - "{{ list_var_1[0] }}"
+          - "{{ list_var_1.0 }}"
+          - "{{ list_var_1 | first }}"
+
+    - name: Show name entry of a dict
+      ansible.builtin.debug:
+        msg:
+          - "{{ dict_var_1['name'] }}"
+          - "{{ dict_var_1.name }}"
+
+    
+    - name: Concat variables
+      ansible.builtin.debug:
+        msg:
+          - "{{ string_var~'_bar' }}"
+          - "{{ string_var + '_bar' }}"
+          - "{{ list_var_1[0] + '_' + list_var_1[1]  }}"
+    
+
+    - name: Comparing variables
+      ansible.builtin.debug:
+        msg:
+          - "The value of num1 is {{ num1 }} and num2 {{ num2 }}"
+          - "num1 is equal to num2: {{ num1==num2 }}"
+          - "num1 is not equal to num2: {{ num1 != num2 }}"
+          - "num1 greater than num2: {{ num1 > num2 }}"
+          - "num1 is less than num2: {{ num1 < num2 }}"
+          - "num1 is greater than or equal to num2: {{ num1 >= num2 }}"
+          - "num1 is less than or equal to num2: {{ num1 >= num2 }}"
+
+    - name: Syntax filter
+      ansible.builtin.debug:
+        msg:
+          - "{{ name }}"
+          - "{{ name | lower }}"
+          - "{{ name | upper }}"
+          - "{{ name | capitalize }}"
+          - "{{ name | title }}"
+
+    - name: List and Set
+      ansible.builtin.debug:
+        msg:
+          - "The highest no {{ number_list | max }}"
+          - "The lowest no is {{ number_list | min }}"
+          - "Print only unique values {{ number_list | unique }}"
+          - "Print random no {{ number_list | random }}"
+          - "Join the values of list {{ number_list | join('-') }}"
+
+    - name: filters to work on pathnames
+      ansible.builtin.debug:
+        msg:
+          - "Linux Path: {{ path1 | dirname }}"
+          - "Windows Path: {{ path2 | win_dirname }}"
+          - "Linux script name: {{ path1 | basename }}"
+          - "Split the path: {{ path2 | win_splitdrive }}"
+          - "Windows Drive: {{ path2 | win_splitdrive | first }}"
+          - "Windows File name: {{ path2 | win_splitdrive | last }}"
+          - "Show Full path: {{ path3 | expanduser }}"
+...

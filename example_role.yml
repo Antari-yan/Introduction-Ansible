@@ -1,0 +1,24 @@
+---
+- name: Role examples
+  hosts: ansible_vm
+  become: false
+  gather_facts: false
+
+  roles:
+    - example_role
+    - example_role
+
+- name: Role examples
+  hosts: ansible_vm
+  become: false
+  gather_facts: false
+
+  roles:
+    - role:  example_role
+      vars:
+        run: A
+
+    - role: example_role
+      vars:
+        run: B
+...

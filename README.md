@@ -33,8 +33,11 @@ Be aware of possible differences on other Systems.
   - [Jinja2 Templates](#jinja2-templates)
   - [Vault](#vault)
 - [Extras](#extras)
+  - [Ansible Tower](#ansible-tower)
+  - [Semaphore UI](#semaphore-ui)
   - [Pull Mode](#pull-mode)
   - [Execution Environment](#execution-environment)
+- [Tips](#tips)
 
 
 ## What is Ansible?
@@ -57,6 +60,11 @@ pip install --user --upgrade ansible
 I always recommend to update `ansible` via `pip` to the latest version, this way you will be warned in advance about `deprecations` when using it.  
 Also, **new features**.
 
+Default search paths are:
+- `~/.ansible/`
+- `/usr/share/ansible/`
+- `/etc/ansible/`
+But it is also possible to use a different path, like we will be this repository structure.
 
 ### Directory structure
 ---
@@ -82,24 +90,36 @@ Just add the Systems that you would like to mange with Ansible into the configur
 Host sample1
   HostName target-server.com
   User user1
-  PreferredAuthentication publickey
-  IdentityFile ~/.ssh/key_file_name
+  IdentityFile ~/.ssh/key_file_name1
 
 Host sample2
   HostName 172.1.0.5
   User user2
-  PreferredAuthentication publickey
-  IdentityFile ~/.ssh/key_file_name
+  PreferredAuthentications password
+  
+
+Host sample3
+  HostName 10.1.0.5
+  IdentityFile ~/.ssh/key_file_name3
+  ProxyJump jump-host
 
 Host *
-  IdentityFile ~/.ssh/default_key
-  IdentitiesOnly yes	# Only send configured Identity and not any other
+  User user_default
+  Port 22
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/default_key_file
+  IdentitiesOnly yes
+  ForwardAgent no
   UseRoaming no
   SendEnv LANG LC_*
   Compression yes
 ```
 It is recommended to avoid always reusing the same SSH-Key and also having one without passphrase.  
 If having individual SSH-Keys and passphrases for each System is too tedious consider having one SSH-Key for a group of Systems or one for each customer or whatever fits your infrastructure and requirements.
+```bash
+# Generating SSH Key
+ssh-keygen -t ed25519 -a 64 -b 4096 -C "Ansible SSH Key" -f ~/.ssh/ansible_key
+```
 
 Here are some great talks about SSH and how it can be used in a good way:  
 [Talk about SSH by Leyrer Part1 (german)](https://media.ccc.de/v/gpn20-8-besser-leben-mit-ssh)  
@@ -108,7 +128,7 @@ Here are some great talks about SSH and how it can be used in a good way:
 [Talk about SSH by Leyrer (english)](https://media.ccc.de/v/mch2022-170-ssh-configuration-intermediate-level)
 
 
-Some are saying that to manage Windows Systems `winrm` can/should be used.  
+Some are saying that to manage Windows Systems `winrm`(Windows Remote Management) can/should be used.  
 I highly discourage you to do that, as you can simply use SSH.  
 Also the example scripts that you may find online or by Microsoft to enable `winrm` usually aren't meant for production and disable security features.
 
@@ -307,6 +327,9 @@ datacenter:
 ```
 This example contains a metagroup `network` that includes all network devices and a metagroup `datacenter` that includes the `network` and `webservers` groups.
 
+```bash
+ansible-playbook example_inventory.yml
+```
 
 ### Playbook
 ---
@@ -370,10 +393,22 @@ ansible-playbook <playbook_name>.yml
 With `ansible-playbook --help` you can also check out its multiple additional options.
 
 
+```bash
+ansinle-playbook example_playbook.yml
+```
+See how in this example `windows_docker` is in the list of targeted host because of the `docker_host` group.  
+So again, be careful with how you name your groups.
+
 ### Tasks
 ---
 A task is a singular action that should be run. It can be anything from a simple console command, to disk formatting, network configuration and more. Every possible action is grouped in `namespace` and a [collection](https://docs.ansible.com/ansible/latest/collections/index.html) reaching from [builtin](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/index.html#plugins-in-ansible-builtin) to [community managed](https://docs.ansible.com/ansible/latest/collections/community/index.html).  
 There is also the [ansible-galaxy](https://galaxy.ansible.com/ui/) which contains even more collections outside of the official documentation.
+
+| Namespace | Collection | Module |
+| --------- | ---------- | ------ |
+| ansible   | builtin    | debug  |
+| community | general    | sudoers|
+| kubernetes| core       | helm   |
 
 The `example_tasks.yml` file contains basic examples in how tasks are structured.
 ```bash
@@ -389,6 +424,10 @@ While it is possible to only use the `module` name (like `debug`) it is highly r
 ### Handlers
 ---
 [Handlers guide](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html)
+
+Handlers are singular tasks that only run when `notified` by a `task` and only when that `task` has the status `changed`.  
+This can be useful for example when a change in configuration request the restart of a service but the service shouldn't be restarted when it is not needed.
+
 ```yaml
 - name: Update package cache
   ansible.builtin.package:
@@ -403,7 +442,6 @@ While it is possible to only use the `module` name (like `debug`) it is highly r
         - handler2
 ```
 
-Important:
 Handlers are run in the order they are defined in the `handlers` section and not in the order of the `notify` section.  
 handlers can have utilize the keyword `listen` so that multiple handlers can be grouped together.
 ```yaml
@@ -447,22 +485,152 @@ Handlers from roles are not just contained in their roles but rather inserted in
 
 Handlers notified within the roles section are automatically flushed at the end of the tasks section but before any tasks handlers.
 
+:notebooke: Note
+:-
+Handlers can run `include_tasks`, `import_task` and meta module
+Handlers can't run `include_role`, `import_role`, and meta module `flush_handlers`
 
 ### Roles
 ---
+A [role](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html) can be viewed as a set of tasks and other things grouped together.  
+It has a defined directory structure with eight main standard directories, but it is only required to include at least one of them. Directories not used can be omitted.
+```bash
+roles/
+  example_role/           # this hierarchy represents a "role"
+    defaults/       #
+      main.yml      #  <-- default lower priority variables for this role
+    tasks/          #
+      main.yml      #  <-- tasks file can include smaller files if warranted
+    handlers/       #
+      main.yml      #  <-- handlers file
+    files/          #
+      bar.txt       #  <-- files for use with the copy resource
+      foo.sh        #  <-- script files for use with the script resource
+    templates/      #  <-- files for use with the template resource
+      ntp.conf.j2   #  <------- templates end in .j2
+    vars/           #
+      main.yml      #  <-- variables associated with this role
+    meta/           #
+      main.yml      #  <-- role dependencies
+    library/        # roles can also include custom modules
+    module_utils/   # roles can also include custom module_utils
+    lookup_plugins/ # or other types of plugins, like lookup in this case
 
-add a name when calling a role because Ansible otherwise may not run a role if it has been defined a second time in the same playbook.
+
+  webtier/          # same kind of structure as "example_role" was above, done for the webtier role
+  monitoring/       # ""
+  fooapp/           # ""
+```
+Ansible looks for roles in the following locations:
+- in collections (if you are using them)
+- in a directory named `roles/`, relative to the playbook file
+- in the configured `roles_path`. The default search path is `~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles`
+- in the directory where the playbook file is located
+
+Alternatively the full path can be provided when calling a role:
+```yaml
+---
+- hosts: webservers
+  roles:
+    - role: '/path/to/my/roles/common'
+...
+
+```
+
+You can use roles in three ways:
+- At the play level with the `roles` option: This is the classic way of using roles in a play.
+- At the tasks level with `include_role`: You can reuse roles dynamically anywhere in the `tasks` section of a play using `include_role`.
+- At the tasks level with `import_role`: You can reuse roles statically anywhere in the `tasks` section of a play using `import_role`.
+
+
+By default a role is only run once no matter how often it is defined in a playbook.  
+There are two ways to circumvent this:
+- Passing different variables to the role
+- Within `meta/main.yml` of a role set `allow_duplicates: true`
 
 There is also the [ansible-galaxy](https://galaxy.ansible.com/ui/) which contains even more roles.
 
+```bash
+ansible-playbook example_role.yml
+```
+Uncommenting `allow_duplicates: true` in `roles/example_role/meta/main.yml` will show the difference when passing different variables.
+
+
 ### Vars
 ---
+[Using Variables](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html)
 
-[Variable Precedence](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence)  
-[Variable merging](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/meta_module.html)  
-[Facts and magic variables](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_vars_facts.html)  
-[Custom Facts](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_vars_facts.html#facts-d-or-local-facts)   
-[Special Variables](https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html)
+Variables can be bool, integer, string, list, dictionary and any combination of lists and dictionaries
+```yaml
+vars:
+  int_var: 1
+  string_var: fuu
+  list_var_1: [ fuu, bar, 1 ]
+  list_var_2:
+    - fuu
+    - bar
+    - 1
+  dict_var_1: { name: fuu, number: 2 }
+  dict_var_2:
+    name: fuu
+    number: 1
+  list_dict:
+    - name: fuu
+      number: 3
+    - name: bar
+      number: 4
+  dict_list:
+    names:
+      - fuu
+      - bar
+    number: 5
+```
+
+There are also [Special Variables](https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html) and [Facts](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_vars_facts.html) that can be used as variables.  
+These contain variables containing connection information, paths to ansible files/dirs, facts about a host like OS, IP Address und much more.
+
+Variables can be defined and overwritten in multiple places, which results in a list of [Variable Precedence](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence) from least to greatest (the last listed variables override all other variables):
+1. role defaults (defined in role/defaults/main.yml) 1
+2. inventory file or script group vars 2
+3. inventory group_vars/all 3
+4. playbook group_vars/all 3
+5. inventory group_vars/* 3
+6. playbook group_vars/* 3
+7. inventory file or script host vars 2
+8. inventory host_vars/* 3
+9. playbook host_vars/* 3
+10. host facts / cached set_facts 4
+11. play vars
+12. play vars_prompt
+13. play vars_files
+14. role vars (defined in role/vars/main.yml)
+15. block vars (only for tasks in block)
+16. task vars (only for the task)
+17. include_vars
+18. set_facts / registered vars
+19. role (and include_role) params
+20. include params
+21. extra vars (for example, -e "user=my_user")(always win precedence)
+
+
+To use variable, they can be referenced via double curly braces (Jinja2 syntax) `"{{ int_var }}"`.  
+To create valid YAML syntax, usually the whole expression containing a variable needs to be quoted.  
+This is usually not needed when used in a `when:` statement.
+
+
+It is also possible to define [Custom Facts](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_vars_facts.html#facts-d-or-local-facts).  
+They will be added automatically when running `gather_facts`, but they can also be loaded manually with optionally adding path using:
+```yaml
+tasks:
+    - name: Filter and return only selected facts
+      ansible.builtin.setup:
+        filter:
+          - 'ansible_local'
+        fact_path: "{{ playbook_dir }}/facts.d"
+```
+The default path Ansible is looking for is `/etc/ansible/facts.d` but htat can be changed in `ansible.cfg` with `fact_path=`.
+
+
 
 ### Conditions and Loops
 ---
@@ -478,11 +646,17 @@ There is also the [ansible-galaxy](https://galaxy.ansible.com/ui/) which contain
 [Template testing with python script](https://github.com/Antari-yan/python_jinja2_renderer)
 
 ### Vault
-<hr style="border:0,1px solid grey">
+---
 
 
 ## Extras
 There are some additional tools provided by Ansible that may be of interest, but since I haven't used them yet, they will only be listed here.
+
+### Ansible Tower
+[ansible-tower](https://docs.ansible.com/ansible-tower/latest/html/userguide/overview.html)
+
+### Semaphore UI
+[semaphore](https://www.semui.co/)
 
 ### Pull mode
 [ansible-pull](https://docs.ansible.com/ansible/latest/cli/ansible-pull.html)
@@ -490,3 +664,6 @@ There are some additional tools provided by Ansible that may be of interest, but
 ### Execution Environment
 [Containerized Execution Environments](https://ansible.readthedocs.io/en/latest/getting_started_ee/index.html)  
 [Ansible Builder guide](https://ansible.readthedocs.io/projects/builder/en/latest/)
+
+## Tips
+- Test your playbooks and roles on a minimal version of your desired OS Distribution to ensure you have proper tasks added to install dependencies

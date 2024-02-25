@@ -15,31 +15,31 @@ all:
           children:
             linux_clients:
               hosts:
-                client1:
-                client2:
+                linux_client1:
+                linux_client2:
             linux_server:
               hosts:
-                server1:
+                linux_server1:
               children:
                 docker_host:
                   hosts:
-                    docker_linux:
+                    linux_docker:
                 webservers:
                   hosts:
-                    www[01:50:2].example.com:
+                    www[01:06:2].example.com: # Contains hosts starting with www01 to www06 with (optional) step 2
 
         windows_all:
           children:
             windows_clients:
               hosts:
-                client1:
+                windows_client1:
             windows_server:
               hosts:
-                server1:
+                windows_server1:
               children:
                 docker_host:
                   hosts:
-                    docker_windows:
+                    windows_docker:
 
     external:
       hosts:
@@ -48,6 +48,16 @@ all:
           ansible_user: git
           ansible_port: 22
           ansible_ssh_private_key_file: ~/.ssh/<your_ssh_key>
+
+clients_all:
+  children:
+    linux_clients:
+    windows_clients:
+
+server_all:
+  children:
+    linux_server:
+    windows_server:
 
 hosts:
   ungrouped_host:

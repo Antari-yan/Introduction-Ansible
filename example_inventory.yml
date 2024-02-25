@@ -1,0 +1,37 @@
+---
+- name: Show all targets of linux_clients group
+  hosts: linux_clients
+  gather_facts: false
+  become: false
+
+  tasks:
+    - name: All Hosts targeted by this play
+      ansible.builtin.debug:
+        msg: "{{ ansible_play_batch }}"
+      run_once: true
+      delegate_to: localhost
+
+
+- name: Show all targets of clients_all group
+  hosts: clients_all
+  gather_facts: false
+
+  tasks:
+    - name: All Hosts targeted by this play
+      ansible.builtin.debug:
+        msg: "{{ ansible_play_batch }}"
+      run_once: true
+      delegate_to: localhost
+
+
+- name: Show all targets of docker_host group
+  hosts: docker_host
+  gather_facts: false
+
+  tasks:
+    - name: All Hosts targeted by this play
+      ansible.builtin.debug:
+        msg: "{{ ansible_play_batch }}"
+      run_once: true
+      delegate_to: localhost
+...

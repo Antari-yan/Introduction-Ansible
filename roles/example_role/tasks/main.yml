@@ -1,0 +1,6 @@
+---
+- name: Basic task
+  ansible.builtin.debug:
+    msg:
+      - "I am a task within a role"
+...

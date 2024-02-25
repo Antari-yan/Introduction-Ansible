@@ -1,0 +1,46 @@
+---
+- name: Show all targets of linux_server group
+  hosts: linux_server
+  gather_facts: false
+  become: false
+
+  pre_tasks:
+
+  roles:
+
+  tasks:
+    - name: All Hosts targeted by this play
+      ansible.builtin.debug:
+        msg: "{{ ansible_play_batch }}"
+      run_once: true
+      delegate_to: localhost
+
+  post_tasks:
+
+  handlers:
+
+
+
+- name: Show all targets of linux_server !webservers group
+  hosts: linux_server !webservers
+  gather_facts: false
+
+  tasks:
+    - name: All Hosts targeted by this play
+      ansible.builtin.debug:
+        msg: "{{ ansible_play_batch }}"
+      run_once: true
+      delegate_to: localhost
+
+
+- name: Show all targets of linux_* group
+  hosts: linux_*
+  gather_facts: false
+
+  tasks:
+    - name: All Hosts targeted by this play
+      ansible.builtin.debug:
+        msg: "{{ ansible_play_batch }}"
+      run_once: true
+      delegate_to: localhost
+...
