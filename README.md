@@ -287,7 +287,7 @@ With my configuration any `YAML` or `ini` will be automatically loaded from the 
 When building your inventory be careful with naming a group, because groups with the same name will be grouped together when called directly. Whis is also known as `metagroup`  
 This can be seen when running the following example:
 ```bash
-ansible-playbook example_grouping.yml
+ansible-playbook example_host_grouping.yml
 ```
 In the recap you will see two host because both are in the sub-group `docker_host` even though they are in separate different sub-groups.  
 Because of this I recommend using unique names for a group like adding a suffix or prefix to the name of the parent group or something like `prod_` and `staging_`.
@@ -667,3 +667,5 @@ There are some additional tools provided by Ansible that may be of interest, but
 
 ## Tips
 - Test your playbooks and roles on a minimal version of your desired OS Distribution to ensure you have proper tasks added to install dependencies
+- Increase verbosity with -v, -vv ...
+- To save output of an Ansible run to file set `log_path=` in the `ansible.cfg`

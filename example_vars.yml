@@ -32,8 +32,8 @@
     name: Fuu Bar
     number_list: [1,2,3,4,5,6,5,3,7,1,9]
     path1: "/opt/custom/data/bin/script.sh"
-    path2: 'C:\Users\deeprasa\PycharmProjects\elasticsearch\test.log'
-    path3: "~/jinja2_temp_5.yml"
+    path2: 'C:\Users\random\test.log'
+    path3: "~/sample_file.yml"
 
   tasks:
     - name: Show variables

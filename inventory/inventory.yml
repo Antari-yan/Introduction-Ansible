@@ -21,7 +21,7 @@ all:
               hosts:
                 linux_server1:
               children:
-                docker_host:
+                docker_host:  # Beware, hosts in groups with the same name are grouped together, when the group is used in a playbook
                   hosts:
                     linux_docker:
                 webservers:
@@ -37,7 +37,7 @@ all:
               hosts:
                 windows_server1:
               children:
-                docker_host:
+                docker_host:  # Beware, hosts in groups with the same name are grouped together, when the group is used in a playbook
                   hosts:
                     windows_docker:
 
