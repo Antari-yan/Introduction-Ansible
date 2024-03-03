@@ -28,7 +28,7 @@ Be aware of possible differences on other Systems.
   - [Handlers](#handlers)
   - [Roles](#roles)
   - [Vars](#vars)
-  - [Conditions and Loops](#conditions-and-loops)
+  - [Conditionals and Loops](#conditionals-and-loops)
   - [Grouping and Error handling](#grouping-and-error-handling)
   - [Jinja2 Templates](#jinja2-templates)
   - [Vault](#vault)
@@ -363,7 +363,14 @@ And wildcards:
 
 It can also contain connection settings to override those in the inventory.  
 You can also define settings like `become:` (default: false) to define if everything should be run with privilege escalation (sudo) or `gather_facts:` (default: true) to collect [facts](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_vars_facts.html#id3) which contain information about the target System like operating system, IP and more, or `serial:`to define how many Systems should be configured at the same time and many more settings.  
+Additionally you can define additional `vars` that may also contain or overwrite connection variables like `ansible_user`, `ansible_host` or `ansible_port`.
 It is also possible to define variables under `vars_prompt:` to ask for input for specific variables that you don't want to write down in any file.
+
+Important to note that `become: true` is handled differently when used at the beginning of a `playbook` compared to when used in a specific `task` or `role`.  
+When used at the beginning of a `playbook` Ansible will change the user on the target host to `root`, while when used in e.g. a `task` it is similar to using `sudo`.  
+This is a majorly change that should be taken into account when e.g.: using `ansible_user_id`.  
+Using `become: true` in the heading of a `playbook` should be avoided if possible as running everything as `root` also may create undesired security issues.
+
 
 After the first 'configuration' blog it is possible to define one or all of the following sections:
 - pre_tasks: list of tasks executed before roles
@@ -636,7 +643,7 @@ For that the scripts have to be executable with shebang (e.g.: `#!/usr/bin/env b
 
 
 
-### Conditions and Loops
+### Conditionals and Loops
 ---
 
 ### Grouping and Error handling
@@ -651,6 +658,76 @@ For that the scripts have to be executable with shebang (e.g.: `#!/usr/bin/env b
 
 ### Vault
 ---
+[Vault Guide](https://docs.ansible.com/ansible/latest/vault_guide/)
+
+Ansible provides `vault` capabilities to encrypt files or strings.  
+This part is kept short to give you a rough idea on what you can do with it, but I recommend using a proper `Vault` like [HashiCorp Vault](https://www.hashicorp.com/products/vault), because it provides permission management and more.
+
+You can use either fully encrypted files containing multiple variables or a singular encrypted string.  
+In both cases you have to provide a password through either prompt or a file:
+```bash
+ansible-playbook example_vault.yml --ask-vault-password
+# password: test
+```
+```bash
+ansible-playbook playbook.yml --vault-password-file
+```
+
+Should you need to provide different passwords for your vault files/strings, you have to provide for each of them a `Vault ID` with `--vault-id label@source`.
+
+It is also possible to provide the information in the `ansible.cfg`, e.g.:
+```ini
+ask_vault_pass=False
+vault_encrypt_identity=
+vault_identity=default
+vault_password_file=
+```
+
+
+#### Using a file
+Create a `Vault` file:
+```bash
+env EDITOR=nano ansible-vault create <Vault>.yml
+```
+
+edit a `Vault` file:
+```bash
+# Using default editor (vi)
+ansible-vault edit <Vault>.yml
+
+# Specifying editor
+env EDITOR=nano ansible-vault edit <Vault>.yml
+```
+
+```yaml
+- name: Vault
+  hosts: localhost
+  vars_files:
+    - "vault.yml"
+```
+```bash
+ansible-playbook <name>_playbook.yml --ask-vault-pass
+```
+
+
+#### Using a string
+To create a single encrypted string that can be used as a variable run:
+```bash
+ansible-vault encrypt_string secure_password
+# Type in your desired password
+```
+This returns a multiline string that can be added in full directly in a playbook.
+```yaml
+  vars:
+    my_secret: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          35643133326464663036346464306666623738343062636663666536346239396233626331346435
+          6335623333626634316262663337336533333730353633660a346530316433656533613332363438
+          34303163353263353263613938653239353266393735626361346233323831653061336338653162
+          3637626338613261360a323938656564383734303139383135343662313230663839383738646430
+          3433
+```
+
 
 
 ## Extras
