@@ -628,7 +628,11 @@ tasks:
           - 'ansible_local'
         fact_path: "{{ playbook_dir }}/facts.d"
 ```
-The default path Ansible is looking for is `/etc/ansible/facts.d` but htat can be changed in `ansible.cfg` with `fact_path=`.
+The default path Ansible is looking for is `/etc/ansible/facts.d` but that can be changed in `ansible.cfg` with `fact_path=`.  
+Custom facts need to be either in `JSON` or `INI` format.  
+The content of the files under `facts.d` can be anything, just the return value needs to be correctly formatted.  
+This allows to also run script files (`bash`, `python`, ...) that return e.g. `JSON` formatted `key/value` pairs.  
+For that the scripts have to be executable with shebang (e.g.: `#!/usr/bin/env bash`) and proper permissions (e.g.: `chmod +x facts.d/date_time.fact`).
 
 
 

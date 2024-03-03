@@ -1,0 +1,24 @@
+---
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/setup_module.html
+- name: Vars examples
+  hosts: ansible_vm
+  become: false
+  gather_facts: true
+
+  tasks:
+    - name: Filter and return only selected facts
+      ansible.builtin.setup:
+        filter:
+          - 'ansible_local'
+        fact_path: "{{ playbook_dir }}/facts.d"
+
+    - name: Custom facts
+      ansible.builtin.debug:
+        msg:
+          - "{{ ansible_local.ini_preference.general }}"
+          - "{{ ansible_local.json_preference.general }}"
+          - "{{ ansible_local.python_fact }}"
+          - "{{ ansible_local.date_time }}"
+      #delegate_to: "{{ item }}"
+      #delegate_facts: true
+...
