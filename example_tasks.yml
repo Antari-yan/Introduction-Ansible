@@ -1,6 +1,6 @@
 ---
 - name: Task examples
-  hosts: ansible_vm
+  hosts: localhost
   become: false
   gather_facts: false
 

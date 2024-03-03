@@ -1,7 +1,7 @@
 ---
 # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/meta_module.html
 - name: Example Meta Module
-  hosts: ansible_vm
+  hosts: localhost
   gather_facts: false
 
   tasks:

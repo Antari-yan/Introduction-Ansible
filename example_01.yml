@@ -1,6 +1,6 @@
 ---
 - name: First Hello World example
-  hosts: ansible_vm
+  hosts: localhost
 
   tasks:
     - name: Echo like hello world

@@ -1,7 +1,7 @@
 ---
 # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/setup_module.html
 - name: Vars examples
-  hosts: ansible_vm
+  hosts: localhost
   become: false
   gather_facts: true
 

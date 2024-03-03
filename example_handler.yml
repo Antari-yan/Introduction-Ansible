@@ -1,6 +1,6 @@
 ---
 - name: Examples
-  hosts: ansible_vm
+  hosts: localhost
   become: false
   gather_facts: false
 
