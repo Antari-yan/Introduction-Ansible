@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+output=$(docker run --rm alpine echo "test")
+
+echo "{\"docker_output\" : \"${output}\"}"

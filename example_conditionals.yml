@@ -1,0 +1,117 @@
+---
+- name: Conditional operator
+  hosts: localhost
+  gather_facts: false
+  vars:
+    x: 10
+    y: 15
+    list: [10,20,30]
+
+  tasks:
+    - name: Check if x:{{ x }} equals y:{{ y }}
+      when: x == y
+      ansible.builtin.debug:
+        msg:
+          - "The value of x is {{ x }} and the value of y is {{ y }}"
+          - "Our list contains: {{ list }}"
+      
+    - name: Check if x is in the list
+      when: x in list
+      ansible.builtin.debug:
+        msg: "x is present in the list"
+
+    
+    - name: Skip
+      when: false
+      ansible.builtin.debug:
+        msg: "Skip this"
+      register: task_state
+
+    - name: Runs when previous tasks has skipped
+      when: task_state.skipped
+      ansible.builtin.debug:
+        msg: "Only shows when previous task has skipped"
+    
+    - name: Runs when previous tasks hasn't skipped
+      when: not task_state.skipped
+      ansible.builtin.debug:
+        msg: "Only shows when previous task hasn't skipped"
+      
+
+- name: And / Or
+  hosts: localhost
+  gather_facts: false
+  vars:
+    some_list: []
+    some_dict: {}
+
+  tasks:
+    - name: And
+      block:
+        - name: Check if some_list is a list
+          when:
+            - some_list is defined
+            - some_list is not mapping
+            - some_list is iterable
+            - some_list is not string
+          ansible.builtin.debug:
+            msg: "some_list is a list"
+        
+        - name: Check if some_dict is a list
+          when:
+            - some_dict is defined
+            - some_dict is not mapping
+            - some_dict is iterable
+            - some_dict is not string
+          ansible.builtin.debug:
+            msg: "some_dict is a list"
+        
+        - name: Check if some_list is a dict
+          when:
+            - some_list is defined
+            - some_list is mapping
+            - some_list is iterable
+            - some_list is not string
+          ansible.builtin.debug:
+            msg: "some_list is a dict"
+        
+        - name: Check if some_dict is a dict
+          when:
+            - some_dict is defined
+            - some_dict is mapping
+            - some_dict is iterable
+            - some_dict is not string
+          ansible.builtin.debug:
+            msg: "some_dict is a dict"
+
+    - name: Or
+      block:
+        - name: Check if some_list is a list or a dict
+          when:
+            - some_list is defined and some_list is iterable and some_list is not string
+            - some_list is not mapping or some_list is mapping
+          ansible.builtin.debug:
+            msg: "some_list is a list or a dict"
+
+        - name: Check if some_dict is a list or a dict
+          when: >
+            (some_list is defined and some_list is iterable and some_list is not string) and
+            some_list is not mapping or
+            some_list is mapping
+          ansible.builtin.debug:
+            msg: "some_list is a list or a dict"
+
+
+- name: Logical Operator
+  hosts: localhost
+  gather_facts: false
+  vars:
+    hello: true
+    say_something: "{% if hello == true %} Hello Jinja {% else %} Goodbye Ansible {% endif %}"
+
+  tasks:
+    - name: Jinja2 logical operation
+      ansible.builtin.debug:
+        msg:
+          - "{{ say_something }}"
+...

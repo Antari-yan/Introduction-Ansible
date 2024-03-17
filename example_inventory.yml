@@ -1,4 +1,15 @@
 ---
+- name: Local connection
+  hosts: local_system
+  gather_facts: false
+  become: false
+
+  tasks:
+    - name: Show connection setting
+      ansible.builtin.debug:
+        msg: "{{ ansible_connection }}"
+
+
 - name: Show all targets of linux_clients group
   hosts: linux_clients
   gather_facts: false

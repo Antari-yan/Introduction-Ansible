@@ -3,6 +3,14 @@
 :-
 
 
+
+
+Difference using `localhost` or `ansible_connection: local` or `ansible_vm`?
+
+
+
+
+
 Intention for this repository is to provide a basic introduction to Ansible while also providing a usable base structure with examples.  
 The goal is not to cover anything and everything Ansible is capable of but enough to make practical use of it
 
@@ -265,7 +273,7 @@ all:
       children:
         ansible_vm:
           hosts:
-            localhost:
+            local_system:
               ansible_connection: local
               host_test_var: test
           vars:
@@ -641,10 +649,53 @@ The content of the files under `facts.d` can be anything, just the return value 
 This allows to also run script files (`bash`, `python`, ...) that return e.g. `JSON` formatted `key/value` pairs.  
 For that the scripts have to be executable with shebang (e.g.: `#!/usr/bin/env bash`) and proper permissions (e.g.: `chmod +x facts.d/date_time.fact`).
 
+```bash
+ansible-playbook  example_vars.yml
+```
 
 
 ### Conditionals and Loops
 ---
+Ansible allows to check for specific conditions before running a `task` or `block` using the `when` keyword.  
+It can be used to check if some variable contains desired information, like if something is set to `true`, is a specific package installed, etc..  
+`when` can either be a single line string or a multiline list.  
+When stated with a list each part in that list is connected as if `and` is used.  
+Conditions can be linked together with `and` and `or` keywords.
+```bash
+ansible-playbook  example_conditionals.yml
+```
+
+
+[Loops](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_loops.html) allows repetitive execution of a single task.  
+This can be useful to e.g. install multiple packages, create multiple user, etc..
+Most commonly loops are used to iterate over a list where each singular part is available with the `"{{ item }}` keyword.
+
+```bash
+ansible-playbook  example_loops.yml
+```
+
+Loops can be managed with the [loop_control](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_loops.html#adding-controls-to-loops) keyword.  
+It allows to set a `label`which can be used to define the console output during the task run. This can be used  e.g. when iterating over list of dicts `"{{ item.name }}"`.  
+Additionally it is possible to [extend](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_loops.html#extended-loop-variables) the loop information by setting `extended: true` in the `loop_control`, which adds the following information:
+| Variable               | Description                                                                             |
+| ---------------------- | --------------------------------------------------------------------------------------- |
+| ansible_loop.allitems  | The list of all items in the loop                                                       |
+| ansible_loop.index     | The current iteration of the loop. (1 indexed)                                          |
+| ansible_loop.index0    | The current iteration of the loop. (0 indexed)                                          |
+| ansible_loop.revindex  | The number of iterations from the end of the loop (1 indexed)                           |
+| ansible_loop.revindex0 | The number of iterations from the end of the loop (0 indexed)                           |
+| ansible_loop.first     | True if first iteration                                                                 |
+| ansible_loop.last      | True if last iteration                                                                  |
+| ansible_loop.length    | The number of items in the loop                                                         |
+| ansible_loop.previtem  | The item from the previous iteration of the loop. Undefined during the first iteration. |
+| ansible_loop.nextitem  | The item from the following iteration of the loop. Undefined during the last iteration. |
+
+
+Sometimes it can also be useful to loop over something but only do something when an `item` meets a specific condition.
+```bash
+ansible-playbook  example_loop_conditionals.yml
+```
+
 
 ### Grouping and Error handling
 ---
@@ -661,7 +712,8 @@ For that the scripts have to be executable with shebang (e.g.: `#!/usr/bin/env b
 [Vault Guide](https://docs.ansible.com/ansible/latest/vault_guide/)
 
 Ansible provides `vault` capabilities to encrypt files or strings.  
-This part is kept short to give you a rough idea on what you can do with it, but I recommend using a proper `Vault` like [HashiCorp Vault](https://www.hashicorp.com/products/vault), because it provides permission management and more.
+This part is kept short to give you a rough idea on what you can do with it, but it is recommended to use a proper `Vault` like [HashiCorp Vault](https://www.hashicorp.com/products/vault), because it provides permission management and more.  
+The Ansible vault is essentially just an encrypted file providing limited security improvement.
 
 You can use either fully encrypted files containing multiple variables or a singular encrypted string.  
 In both cases you have to provide a password through either prompt or a file:
@@ -749,4 +801,4 @@ There are some additional tools provided by Ansible that may be of interest, but
 ## Tips
 - Test your playbooks and roles on a minimal version of your desired OS Distribution to ensure you have proper tasks added to install dependencies
 - Increase verbosity with -v, -vv ...
-- To save output of an Ansible run to file set `log_path=` in the `ansible.cfg`
+- To save the output of an Ansible run to a file, set `log_path=` in the `ansible.cfg`

@@ -1,0 +1,34 @@
+---
+# Tags can be used when starting the Playbook. For example:
+# ansible-playbook "example_tags.yml" --tags general
+# ansible-playbook "example_tags.yml" --tags first,third
+# ansible-playbook "example_tags.yml" --skip-tags fourth
+
+# The task with the tag "never" will not be executed by default unless you specifically call the tag name of that task (through --tags fourth)
+
+  - name: Ansible Tags
+    hosts: localhost
+    gather_facts: false
+    tasks:
+      - debug:
+          msg: "This is first task"
+        tags:
+          - first
+          - general
+      - debug:
+          msg: "This is second task"
+        tags: second
+      - debug:
+          msg: "This is third task"
+        tags:
+          - third
+          - general
+      - debug:
+          msg: "This is fourth task"
+        tags: fourth
+      - debug:
+          msg: "This is fifth task"
+        tags:
+          - fifth
+          - never
+...

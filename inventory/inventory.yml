@@ -5,7 +5,7 @@ all:
       children:
         ansible_vm:
           hosts:
-            localhost:
+            local_system:
               ansible_connection: local
               host_test_var: test
           vars:

@@ -1,0 +1,15 @@
+---
+- name: Loops with conditionals
+  hosts: localhost
+  gather_facts: false
+  vars:
+    fname: [1,2,3,4]
+
+  tasks:
+    - name: Iterate over hashes
+      ansible.builtin.debug:
+        msg:
+        - "Item: {{item}}"
+      when: item != 1
+      loop: "{{fname}}"
+...

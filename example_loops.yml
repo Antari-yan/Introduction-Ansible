@@ -1,0 +1,63 @@
+---
+# As we capture the output from any command using register, similar can be done for loop output.
+# The only difference is that the results will now be stored in a dictionary,
+# with one dictionary entry for each iteration of the loop rather than just one set of results.
+
+# For example in the existing playbook I have reduced the number of item to shorten the output
+# and then I will store the output into "loopresult" variable.
+# Then we will print the content of loopresult variable:
+
+- name: Working with loop module
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Echo the value
+      command: echo "{{ item }}"
+      loop:
+        - 1
+        - 2
+      register: loopresult
+    - name: print the results from loop
+      ansible.builtin.debug:
+        var: loopresult
+
+
+- name: Working with loop module
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Iterate over list of dict
+      ansible.builtin.debug:
+        msg:
+        - "Hello '{{ item.fname }}', nice to meet you"
+        - "Your last name as per our record is '{{ item.lname }}'"
+        - "Your country of residence is '{{ item.location }}'"
+      loop:
+        - { fname: 'hekate', lname: 'torkel', location: 'Japan' }
+        - { fname: 'gertruda', lname: 'venkata', location: 'Belgium' }
+        - { fname: 'giffard', lname: 'aisha', location: 'Switzerland' }
+        - { fname: 'odilia', lname: 'loann', location: 'America' }
+        - { fname: 'walaric', lname: 'esther', location: 'Brazil' }
+      loop_control:
+        label: "{{ item.fname }}"
+
+
+- name: Working with loop module
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Iterate over dictionary
+      ansible.builtin.debug:
+        msg:
+        - "The {{ item.key }} of your car is {{ item.value }}"
+      loop: "{{ my_car | dict2items }}"
+      vars:
+        my_car:
+          Color: Black
+          Model: Trueno
+          Transition: Manual
+          Price: $30,000
+...

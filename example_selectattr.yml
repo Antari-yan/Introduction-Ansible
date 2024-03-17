@@ -1,0 +1,30 @@
+---
+- hosts: localhost
+  gather_facts: false
+  vars:
+    lacp_groups:
+      - master: lacp0
+        network: 10.65.100.0/24
+        gateway: 10.65.100.1
+        dns4:
+          - 10.65.100.10
+          - 10.65.100.11
+        interfaces:
+          - em1
+          - em2
+
+      - master: lacp1
+        network: 10.65.120.0/24
+        gateway: 10.65.120.1
+        dns4:
+          - 10.65.100.10
+          - 10.65.100.11
+        interfaces:
+            - em3
+            - em4
+
+  tasks:
+    - name: Show "master" that contains em1
+      ansible.builtin.debug:
+        msg: "{{ (lacp_groups|selectattr('interfaces', 'contains', 'em1')|first).master }}"
+...
