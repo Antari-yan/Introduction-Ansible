@@ -1,0 +1,17 @@
+---
+- name: Prompt example
+  hosts: localhost
+  become: false
+  gather_facts: false
+
+  vars_prompt:
+    - name: some_input
+      prompt: Enter something
+      unsafe: true
+      private: true
+
+  tasks:
+    - name: Show prompt result
+      debug:
+        var: some_input
+...
