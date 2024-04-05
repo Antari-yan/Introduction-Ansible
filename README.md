@@ -3,10 +3,8 @@
 :-
 
 
-
-
 Intention for this repository is to provide a basic introduction to Ansible while also providing a usable base structure with examples.  
-The goal is not to cover anything and everything Ansible is capable of but enough to make practical use of it
+The goal is not to cover everything Ansible is capable of but enough to make practical use of it.
 
 :notebook: NOTE
 :-
