@@ -571,6 +571,7 @@ Uncommenting `allow_duplicates: true` in `roles/example_role/meta/main.yml` will
 ### Vars
 ---
 [Using Variables](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html)
+[Filter plugins](https://docs.ansible.com/ansible/latest/plugins/filter.html)
 
 Variables can be bool, integer, string, list, dictionary and any combination of lists and dictionaries
 ```yaml

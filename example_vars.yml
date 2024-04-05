@@ -5,7 +5,7 @@
   gather_facts: true
 
   vars:
-    my_unsafe_variable: !unsafe 'unsafe % value'  # The varialbe content of this var won't be shown ion logs
+    my_unsafe_variable: !unsafe 'unsafe % value'  # The content of this var won't be shown ion logs
 
     int_var: 1
     string_var: fuu
