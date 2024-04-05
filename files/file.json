@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "An Bi",
+    "username": "Fancy",
+    "email": "fancy@mail.com",
+    "address": {
+      "street": "Boring Street",
+      "suite": "11",
+      "city": "Nowhere",
+      "zipcode": "12345-6789"
+    },
+    "phone": "1-234-567-8910 x66666",
+    "website": "an.bi.com",
+    "company": {
+      "name": "Google Inc.",
+      "catchPhrase": "Be evil",
+      "bs": "Search engine"
+    }
+  },
+  {
+    "id": 2,
+    "name": "Sherlock Holmes",
+    "username": "NoShit",
+    "email": "fic@tion.al",
+    "address": {
+      "street": "Baker Street",
+      "suite": "221B",
+      "city": "London",
+      "zipcode": "99999-3777"
+    },
+    "phone": "9-234-567-8910 x66666",
+    "website": "holmes.net",
+    "company": {
+      "name": "Sherlock Holmes Consulting Detective"
+    }
+  }
+]
