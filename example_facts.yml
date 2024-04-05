@@ -1,0 +1,34 @@
+---
+- name: Facts
+  hosts: local_system
+  become: false
+  gather_facts: false
+  #gather_facts: true
+
+  tasks:
+    - name: Read ansible_user_id and ansible_user_dir
+      ansible.builtin.setup:
+        filter:
+          - ansible_user_id
+          - ansible_user_dir
+
+    - name: Print all available facts
+      ansible.builtin.debug:
+        var: ansible_facts
+
+
+    - name: Show some facts
+      when: false # Only set to true when gather_facts: true
+      ansible.builtin.debug:
+        msg:
+          - "System OS: {{ hostvars['local_system']['ansible_facts']['distribution'] }}"
+          - "Ansible Version: {{ ansible_version.full }}"
+          - "List of Hosts still active in current play: {{ ansible_play_hosts }}"
+          - "Listb of all Hosts in current play batch: {{ ansible_play_batch }}"
+          - "Python executable used to invoke the Ansible: {{ ansible_playbook_python }}"
+          - "Is Ansible run with --check: {{ ansible_check_mode }}"
+          - "Playbook base directory {{ playbook_dir }}"
+          - "Directory name of Ansible’s inventory host file: {{ inventory_dir }}" # Doesn't work if target is localhost
+          - "Filename of Ansible’s inventory host file: {{ inventory_file }}"  # Doesn't work if target is localhost
+          #- "Current role’s pathname: {{ role_path }}"  # only works within a role
+...

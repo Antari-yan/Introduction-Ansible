@@ -6,7 +6,7 @@
   gather_facts: false
 
   tasks:
-    - name: Filter and return only selected facts
+    - name: Collect local ansible facts
       ansible.builtin.setup:
         filter:
           - 'ansible_local'

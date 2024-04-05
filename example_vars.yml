@@ -99,7 +99,7 @@
           - "Print random no {{ number_list | random }}"
           - "Join the values of list {{ number_list | join('-') }}"
 
-    - name: filters to work on pathnames
+    - name: Filters to work on pathnames
       ansible.builtin.debug:
         msg:
           - "Linux Path: {{ path1 | dirname }}"
@@ -109,4 +109,11 @@
           - "Windows Drive: {{ path2 | win_splitdrive | first }}"
           - "Windows File name: {{ path2 | win_splitdrive | last }}"
           - "Show Full path: {{ path3 | expanduser }}"
+
+    - name: Show current time
+      ansible.builtin.debug:
+        msg:
+          - "{{ ansible_date_time }}" # Created and cached when Ansible gathers facts before each playbook run
+          - "{{ lookup('pipe', 'date +%Y-%m-%d.%H:%M:%S') }}"
+          - "{{ now() }}" # Jinja2
 ...
