@@ -8,7 +8,7 @@
 Intention for this repository is to provide a basic introduction to Ansible while also providing a usable base structure with examples.  
 The goal is not to cover anything and everything Ansible is capable of but enough to make practical use of it
 
-:note: NOTE
+:notebook: NOTE
 :-
 The examples are tested on a `Debian` based System.  
 Be aware of possible differences on other Systems.
