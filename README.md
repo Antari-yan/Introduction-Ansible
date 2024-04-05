@@ -50,7 +50,7 @@ Be aware of possible differences on other Systems.
 
 ## What is Ansible?
 Ansible is an IT automation tool. It can be used to Configure and Deploy Systems and Software.
-It can be viewed, in a classical way, as a collection of installer script to ensure a System reaches a desired state of operation, but with the intend of making these scripts reusable on multiple Systems while making it possible to re-run the same scripts on a System multiple times without making chages if the desired state has already been reached ([idempotent](https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#term-Idempotency)).   
+It can be viewed, in a classical way, as a collection of installer script to ensure a System reaches a desired state of operation, but with the intend of making these scripts reusable on multiple Systems while making it possible to re-run the same scripts on a System multiple times without making changes if the desired state has already been reached ([idempotent](https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#term-Idempotency)).   
 Through `SSH` it connects to Systems and Devices and manages them based on `YAML` and `Python` Code.  
 Because of this Ansible is essentially agent-less. The target Systems only need to be able to accept SSH connections (e.g. openssh-server).  
 It also has decent [Documentation](https://docs.ansible.com/ansible/latest/).  
@@ -427,7 +427,7 @@ There is also the [ansible-galaxy](https://galaxy.ansible.com/ui/) which contain
 
 The `example_tasks.yml` file contains basic examples in how tasks are structured.
 ```bash
-ansible-playbook example_tasks.ym
+ansible-playbook example_tasks.yml
 ```
 A task can additional to it's action contain where, when and with what privileges it should run and more.
 
@@ -492,7 +492,7 @@ tasks:
   - name: Some other tasks
     ansible.builtin.shell: ...
 ```
-The meta: flush_handlers task triggers any handlers that have been notified at that point in the play.
+The `meta: flush_handlers` task triggers any handlers that have been notified at that point in the play.
 
 Once handlers are executed, either automatically after each mentioned section or manually by the flush_handlers meta task, they can be notified and run again in later sections of the play.
 
@@ -504,6 +504,11 @@ Handlers notified within the roles section are automatically flushed at the end 
 :-
 Handlers can run `include_tasks`, `import_task` and meta module
 Handlers can't run `include_role`, `import_role`, and meta module `flush_handlers`
+
+The `example_handlers.yml` file contains basic examples for handlers.
+```bash
+ansible-playbook example_handlers.yml
+```
 
 ### Roles
 ---
@@ -656,7 +661,7 @@ ansible-playbook  example_vars.yml
 
 ### Conditionals and Loops
 ---
-Ansible allows to check for specific conditions before running a `task` or `block` using the `when` keyword.  
+Ansible allows to check for specific conditions before running a `task`, `role`, `block`, etc. using the `when` keyword.  
 It can be used to check if some variable contains desired information, like if something is set to `true`, is a specific package installed, etc..  
 `when` can either be a single line string or a multiline list.  
 When stated with a list each part in that list is connected as if `and` is used.  
@@ -701,6 +706,10 @@ ansible-playbook  example_loop_conditionals.yml
 ---
 [Block guide](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_blocks.html)
 
+The `example_block.yml` file contains basic examples for block, rescue, always.
+```bash
+ansible-playbook example_block.yml
+```
 
 ### Jinja2 Templates
 ---

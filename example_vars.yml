@@ -62,7 +62,7 @@
           - "{{ dict_var_1.name }}"
 
     
-    - name: Concat variables
+    - name: Concat/Append variables
       ansible.builtin.debug:
         msg:
           - "{{ string_var~'_bar' }}"
