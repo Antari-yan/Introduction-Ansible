@@ -5,16 +5,10 @@
 
 
 
-Difference using `localhost` or `ansible_connection: local` or `ansible_vm`?
-
-
-
-
-
 Intention for this repository is to provide a basic introduction to Ansible while also providing a usable base structure with examples.  
 The goal is not to cover anything and everything Ansible is capable of but enough to make practical use of it
 
-:warning: WARNING
+:note: NOTE
 :-
 The examples are tested on a `Debian` based System.  
 Be aware of possible differences on other Systems.
@@ -656,6 +650,8 @@ For that the scripts have to be executable with shebang (e.g.: `#!/usr/bin/env b
 
 ```bash
 ansible-playbook  example_vars.yml
+ansible-playbook  example_facts.yml
+ansible-playbook  example_custom_facts.yml
 ```
 
 
