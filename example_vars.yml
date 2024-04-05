@@ -55,6 +55,11 @@
           - "{{ list_var_1.0 }}"
           - "{{ list_var_1 | first }}"
 
+    - name: Show last entry of a list
+      ansible.builtin.debug:
+        msg:
+          - "{{ list_var_1 | last }}"
+
     - name: Show name entry of a dict
       ansible.builtin.debug:
         msg:
