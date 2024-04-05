@@ -1,0 +1,54 @@
+---
+- name: Configure server
+  when: nfs_server
+  become: true
+  block:
+    - name: Install NFS server
+      ansible.builtin.package:
+        name: nfs-kernel-server
+        state: present
+
+    - name: Start and enable NFS server
+      ansible.builtin.systemd_service:
+        name: nfs-kernel-server.service
+        state: started
+        enabled: true
+
+    - name: Ensure NFS data directory
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+      loop: "{{ nfs_server_export }}"
+
+    - name: Configure NFS export from template
+      ansible.builtin.template:
+        src: export.j2
+        dest: /etc/exports
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart NFS server
+
+
+- name: Configure client
+  when: nfs_client
+  become: true
+  block:
+    - name: Install NFS client
+      ansible.builtin.package:
+        name: nfs-common
+        state: present
+
+    - name: Ensure NFS mount directory
+      ansible.builtin.file:
+        path: "{{ nfs_server_mount_dest }}"
+        state: directory
+
+    - name: Mount NFS to {{ nfs_server_mount_dest }}
+      ansible.posix.mount:
+        src: "{{ nfs_server_mount_src }}"
+        path: "{{ nfs_server_mount_dest }}"
+        fstype: nfs
+        opts: "{{ nfs_server_mount_options }}"
+        state: mounted
+...

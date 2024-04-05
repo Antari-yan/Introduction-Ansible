@@ -1,0 +1,11 @@
+---
+nfs_server: false
+nfs_client: false
+nfs_server_mount_src: ''
+nfs_server_mount_dest: ''
+nfs_server_mount_options: defaults
+
+nfs_server_export: []
+#  - path:
+#    options:
+...
