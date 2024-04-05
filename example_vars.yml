@@ -123,4 +123,9 @@
           - "{{ ansible_date_time }}" # Created and cached when Ansible gathers facts before each playbook run
           - "{{ lookup('pipe', 'date +%Y-%m-%d.%H:%M:%S') }}"
           - "{{ now() }}" # Jinja2
+
+    - name: List all groups in inventory
+      ansible.builtin.debug:
+        msg:
+          - "{{ groups.keys() | list }}"
 ...

@@ -1,6 +1,18 @@
 ---
-- name: Host Grouping
+- name: Host Grouping 1
   hosts: "*_server"
+  become: false
+  gather_facts: false
+
+  tasks:
+    - name: Show hostname in inventory
+      ansible.builtin.debug:
+        msg:
+          - "{{ inventory_hostname }}"
+
+
+- name: Host Grouping 2
+  hosts: linux*clients
   become: false
   gather_facts: false
 

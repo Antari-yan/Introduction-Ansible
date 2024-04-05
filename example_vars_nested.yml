@@ -1,0 +1,49 @@
+---
+# https://docs.ansible.com/ansible/latest/collections/community/docker/index.html
+# https://docs.ansible.com/ansible/latest/collections/community/docker/docker_swarm_module.html
+- name: Nested
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    some_dict:
+      vscsi:
+        vhost1:
+          info: azerty
+          vtds:
+            AZER_TY_125:
+              status: UP
+              device: disk1
+            AZER_TY_456:
+              status: UP
+              device: disk2
+        vhost2:
+          info: azerty
+          vtds:
+            QWER_TY_123:
+              status: UP
+              device: disk2
+            QWER_TY_456:
+              status: DOWN
+              device: disk3
+        vhost3:
+          info: azerty
+          vtds:
+            QWER_TI_123:
+              status: DOWN
+              device: disk4
+    list_dict:
+      - { name: a, fuu: bar }
+      - { name: b, fuu: baz }
+        
+
+  tasks:
+    - name: Listing all device and their vhosts
+      ansible.builtin.debug:
+        msg: "{{ list_dict | json_query('[].name') | flatten | unique }}"
+
+    - name: Listing all device and their vhosts
+      ansible.builtin.debug:
+        msg: "{{ some_dict|json_query('*.*.vtds.*.device') | flatten | unique }}"
+
+...

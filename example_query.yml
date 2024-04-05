@@ -1,0 +1,51 @@
+---
+- name: Query
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    ignore_groups:
+      - webservers
+      - "*_server"
+      - ungrouped
+
+  tasks:
+    - name: Get JSON file content
+      ansible.builtin.set_fact:
+        jsondata: "{{ lookup('file','files/file.json') | from_json }}"
+
+    - name: "Query partial JSON content, e.g.: Business Card"
+      ansible.builtin.debug:
+        msg: "{{ jsondata | community.general.json_query(some_data) }}"
+      vars:
+        some_data: "[*].{Name: name, Email: email, Phone: phone, CompanyName: company.name, WebSite: website, City: address.city}"
+
+
+    - name: List all hosts in inventory
+      ansible.builtin.debug:
+        msg:
+          - "{{ query('inventory_hostnames', 'all') }}"
+
+    - name: List all hosts in inventory except for some groups
+      ansible.builtin.debug:
+        msg:
+          - "{{ query('inventory_hostnames', 'all') }}"
+          - "{{ query('inventory_hostnames', 'all: !webservers !*_server !ungrouped') }}"
+
+    - name: List all hosts in a specific group
+      ansible.builtin.debug:
+        msg:
+          - "{{ query('inventory_hostnames', 'external') }}"
+          - "{{ query('inventory_hostnames', 'linux_all: !*_server') }}"
+          
+
+    - name: Create group list and removing ignores
+      ansible.builtin.set_fact:
+        target_groups: "{{ target_groups|default('all:') + ' !' + item }}"
+      loop: "{{ ignore_groups }}"
+
+    - name: List all hosts in inventory except for some groups via variable
+      ansible.builtin.debug:
+        msg:
+          - "{{ query('inventory_hostnames', target_groups|default('all')) }}"
+...

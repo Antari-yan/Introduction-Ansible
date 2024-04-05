@@ -1,0 +1,15 @@
+---
+# https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_lookups.html
+- name: Lookup
+  hosts: localhost
+  become: false
+  gather_facts: false
+
+  tasks:
+    - name: Lookups
+      ansible.builtin.debug:
+        msg:
+          - "{{ lookup('env', 'USER') }}"
+          - "{{ lookup('pipe', 'date +%Y-%m-%d.%H:%M:%S') }}"
+          - "{{ lookup('file', 'files/ansible_galaxy_packages.yml') }}"
+...

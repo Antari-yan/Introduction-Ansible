@@ -650,6 +650,9 @@ For that the scripts have to be executable with shebang (e.g.: `#!/usr/bin/env b
 ansible-playbook  example_vars.yml
 ansible-playbook  example_facts.yml
 ansible-playbook  example_custom_facts.yml
+ansible-playbook  example_query.yml
+ansible-playbook  example_lookup.yml
+ansible-playbook  example_vars_nested.yml
 ```
 
 
