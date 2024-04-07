@@ -1,8 +1,4 @@
 # Introduction to Ansible
-:warning: WiP
-:-
-
-
 Intention for this repository is to provide a basic introduction to Ansible while also providing a usable base structure with examples.  
 The goal is not to cover everything Ansible is capable of but enough to make practical use of it.
 
@@ -704,15 +700,53 @@ ansible-playbook  example_loop_conditionals.yml
 ---
 [Block guide](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_blocks.html)
 
+Through `blocks` it is possible to group multiple `tasks` together and is the only way to create proper exception handling.  
+They are defined like `tasks` with all tasks being grouped below it through indent and directives like `become` defined on the `block` definition are inherent by all tasks grouped within the `block`.  
+Should a `task` within a `block` fail sections like `rescue` and `always` can be defined.  
+`rescue` will run should a task within `block` fail and `always` will run no matter what happened in `block` or `rescue`.
+
+```yaml
+- name: Sample block
+  become: true
+  block:
+    - name: Some task
+      ansible.builtin.debug:
+        msg: "some task"
+  rescue:
+    - name: Some task when block fails
+      ansible.builtin.debug:
+        msg: "some task"
+  always:
+    - name: Some task always run
+      ansible.builtin.debug:
+        msg: "some task"
+```
+
+
 The `example_block.yml` file contains basic examples for block, rescue, always.
 ```bash
 ansible-playbook example_block.yml
 ```
 
-### Jinja2 Templates
+### Templates
 ---
 [Template testing with lookup](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_lookup.html)  
 [Template testing with python script](https://github.com/Antari-yan/python_jinja2_renderer)
+
+`Jinja2` is a template engine for Python used by Ansible nearly everywhere (e.g. variables, when...).  
+It can also be used to define `templates` for any kind of file that should be placed on the target system.  
+These templates can containing anything from variables, conditionals to loops and more.
+The `example_role` contains a short example in how it can be used.  
+A more detailed example in how a Jinja2 template file can look, please check out [this](https://github.com/Antari-yan/python_jinja2_renderer) repository.
+
+Within a role:
+```yml
+- name: Generate file from Template
+  ansible.builtin.template:
+    src: example.j2
+    dest: /etc/exports
+```
+
 
 ### Vault
 ---
@@ -809,3 +843,10 @@ There are some additional tools provided by Ansible that may be of interest, but
 - Test your playbooks and roles on a minimal version of your desired OS Distribution to ensure you have proper tasks added to install dependencies
 - Increase verbosity with -v, -vv ...
 - To save the output of an Ansible run to a file, set `log_path=` in the `ansible.cfg`
+
+
+
+ToDo:
+Finish:
+- Grouping and Error handling
+- Jinja2 Templates
