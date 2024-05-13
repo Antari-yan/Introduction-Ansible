@@ -20,6 +20,10 @@
       vars:
         some_data: "[*].{Name: name, Email: email, Phone: phone, CompanyName: company.name, WebSite: website, City: address.city}"
 
+    - name: Get all Names freom the JSON file
+      ansible.builtin.debug:
+        msg: "{{ jsondata | community.general.json_query('[*].name') }}"
+
 
     - name: List all hosts in inventory
       ansible.builtin.debug:
