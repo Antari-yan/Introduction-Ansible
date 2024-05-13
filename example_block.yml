@@ -5,14 +5,14 @@
   tasks:
     - block:
       - name: List usr directory content
-        command: "ls -l /usr/"
+        ansible.builtin.command: "ls -l /usr/"
       - name: List root partition content
-        command: "ls -l /root/"
+        ansible.builtin.command: "ls -l /root/"
       - name: List bin directory content
-        command: "ls -l /bin/"
+        ansible.builtin.command: "ls -l /bin/"
       become: yes
     - name: List ansible user's home directory content
-      command: "ls -l ~/"
+      ansible.builtin.command: "ls -l ~/"
 
 - name: Ansible Blocks
   hosts: localhost
@@ -20,15 +20,15 @@
   tasks:
     - block:
       - name: List home directory content
-        command: "ls -l ~/"
+        ansible.builtin.command: "ls -l ~/"
       - name: Failing intentionally
-        command: "ls -l /tmp/does-not-exist"
+        ansible.builtin.command: "ls -l /tmp/does-not-exist"
       rescue:
       - name: Rescue block (perform recovery)
-        debug:
+        ansible.builtin.debug:
           msg: "Something went wrong, cleaning up.."
       always:
       - name: This will execute always
-        debug:
+        ansible.builtin.debug:
           msg: "I will execute even in failure scenario"
 ...
