@@ -3,14 +3,14 @@
   hosts: localhost
   gather_facts: false
   tasks:
-    - block:
-      - name: List usr directory content
-        ansible.builtin.command: "ls -l /usr/"
-      - name: List root partition content
-        ansible.builtin.command: "ls -l /root/"
-      - name: List bin directory content
-        ansible.builtin.command: "ls -l /bin/"
-      become: yes
+    - name: Example block
+      # become: true  # Blocks can have privilege escalation which than will be used for all tasks within it
+      block:
+        - name: List usr directory content
+          ansible.builtin.command: "ls -l /usr/"
+        - name: List bin directory content
+          ansible.builtin.command: "ls -l /bin/"
+
     - name: List ansible user's home directory content
       ansible.builtin.command: "ls -l ~/"
 
@@ -18,17 +18,18 @@
   hosts: localhost
   gather_facts: false
   tasks:
-    - block:
-      - name: List home directory content
-        ansible.builtin.command: "ls -l ~/"
-      - name: Failing intentionally
-        ansible.builtin.command: "ls -l /tmp/does-not-exist"
+    - name: Example block with rescue and always
+      block:
+        - name: List home directory content
+          ansible.builtin.command: "ls -l ~/"
+        - name: Failing intentionally
+          ansible.builtin.command: "ls -l /tmp/does-not-exist"
       rescue:
-      - name: Rescue block (perform recovery)
-        ansible.builtin.debug:
-          msg: "Something went wrong, cleaning up.."
+        - name: Rescue block (perform recovery)
+          ansible.builtin.debug:
+            msg: "Something went wrong, cleaning up.."
       always:
-      - name: This will execute always
-        ansible.builtin.debug:
-          msg: "I will execute even in failure scenario"
+        - name: This will execute always
+          ansible.builtin.debug:
+            msg: "I will execute even in failure scenario"
 ...
