@@ -1,6 +1,6 @@
 # Practical Tasks
 
-1. Change in `example_01.yml` the target Host from `localhost` to your current Host connected with SSH
+1. Change in `example_01.yml` the target Host from `localhost` to your current Host connected with SSH (Hint: Create an SSH Key and add it to `~/.ssh/authorized_keys`)
 2. Create a Playbook to install the following packages with their respective state in a single task
   - Packages:
     - vim: absent
