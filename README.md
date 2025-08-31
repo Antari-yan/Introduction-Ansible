@@ -8,34 +8,6 @@ The examples are tested on a `Debian` based System.
 Be aware of possible differences on other Systems.
 
 
-## Table of Content
-- [What is Ansible?](#what-is-ansible)
-- [Installation](#installation)
-  - [Directory structure](#directory-structure)
-  - [SSH Configuration](#ssh-config)
-    - [SSH-Agent](#ssh-agent)
-    - [TPM 2.0](#tpm-20)
-  - [Prepare target Systems](#prepare-target-systems)
-  - [Ansible Configuration Settings](#ansible-configuration-settings)
-- [Structure](#structure)
-  - [Inventory](#inventory)
-  - [Playbook](#playbook)
-  - [Tasks](#tasks)
-  - [Handlers](#handlers)
-  - [Roles](#roles)
-  - [Vars](#vars)
-  - [Conditionals and Loops](#conditionals-and-loops)
-  - [Grouping and Error handling](#grouping-and-error-handling)
-  - [Jinja2 Templates](#jinja2-templates)
-  - [Vault](#vault)
-- [Extras](#extras)
-  - [Ansible Tower](#ansible-tower)
-  - [Semaphore UI](#semaphore-ui)
-  - [Pull Mode](#pull-mode)
-  - [Execution Environment](#execution-environment)
-- [Tips](#tips)
-
-
 ## What is Ansible?
 Ansible is an IT automation tool. It can be used to Configure and Deploy Systems and Software.
 It can be viewed, in a classical way, as a collection of installer script to ensure a System reaches a desired state of operation, but with the intend of making these scripts reusable on multiple Systems while making it possible to re-run the same scripts on a System multiple times without making changes if the desired state has already been reached ([idempotent](https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#term-Idempotency)).   
@@ -843,10 +815,3 @@ There are some additional tools provided by Ansible that may be of interest, but
 - Test your playbooks and roles on a minimal version of your desired OS Distribution to ensure you have proper tasks added to install dependencies
 - Increase verbosity with -v, -vv ...
 - To save the output of an Ansible run to a file, set `log_path=` in the `ansible.cfg`
-
-
-
-ToDo:
-Finish:
-- Grouping and Error handling
-- Jinja2 Templates
