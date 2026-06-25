@@ -11,6 +11,7 @@
         filter:
           - 'ansible_local'
         fact_path: "{{ playbook_dir }}/facts.d"
+      delegate_to: localhost
 
     - name: Custom facts
       ansible.builtin.debug:

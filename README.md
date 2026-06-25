@@ -2,10 +2,9 @@
 Intention for this repository is to provide a basic introduction to Ansible while also providing a usable base structure with examples.  
 The goal is not to cover everything Ansible is capable of but enough to make practical use of it.
 
-:notebook: NOTE
-:-
-The examples are tested on a `Debian` based System.  
-Be aware of possible differences on other Systems.
+> [!NOTE]
+> The examples are tested on a `Debian` based System.  
+> Be aware of possible differences on other Systems.
 
 
 ## What is Ansible?
@@ -460,10 +459,10 @@ Handlers from roles are not just contained in their roles but rather inserted in
 
 Handlers notified within the roles section are automatically flushed at the end of the tasks section but before any tasks handlers.
 
-:notebooke: Note
-:-
-Handlers can run `include_tasks`, `import_task` and meta module
-Handlers can't run `include_role`, `import_role`, and meta module `flush_handlers`
+> [!NOTE]
+> Handlers can run `include_tasks`, `import_task` and meta modules.  
+> Handlers can't run `include_role`, `import_role`, and meta module `flush_handlers`.
+
 
 The `example_handlers.yml` file contains basic examples for handlers.
 ```bash
@@ -608,6 +607,7 @@ tasks:
         filter:
           - 'ansible_local'
         fact_path: "{{ playbook_dir }}/facts.d"
+      delegate_to: localhost
 ```
 The default path Ansible is looking for is `/etc/ansible/facts.d` but that can be changed in `ansible.cfg` with `fact_path=`.  
 Custom facts need to be either in `JSON` or `INI` format.  
