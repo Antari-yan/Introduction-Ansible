@@ -6,7 +6,7 @@
   #gather_facts: true
 
   tasks:
-    - name: Read ansible_user_id and ansible_user_dir
+    - name: Gather user_id and user_dir
       ansible.builtin.setup:
         filter:
           - ansible_user_id
@@ -16,19 +16,30 @@
       ansible.builtin.debug:
         var: ansible_facts
 
+    # Access facts through the `ansible_facts` dictionary (no `ansible_` prefix).
+    # Top-level injected fact vars such as `ansible_user_id` are deprecated since
+    # ansible-core 2.20 (INJECT_FACTS_AS_VARS) and will be removed in 2.24.
+    - name: Show filtered facts
+      ansible.builtin.debug:
+        msg:
+          - "User ID: {{ ansible_facts['user_id'] }}"
+          - "User home: {{ ansible_facts['user_dir'] }}"
 
     - name: Show some facts
       when: false # Only set to true when gather_facts: true
       ansible.builtin.debug:
         msg:
-          - "System OS: {{ hostvars['local_system']['ansible_facts']['distribution'] }}"
+          - "System OS: {{ ansible_facts['distribution'] }}"
+
+          # Magic variables are unaffected by the deprecation
           - "Ansible Version: {{ ansible_version.full }}"
           - "List of Hosts still active in current play: {{ ansible_play_hosts }}"
-          - "Listb of all Hosts in current play batch: {{ ansible_play_batch }}"
-          - "Python executable used to invoke the Ansible: {{ ansible_playbook_python }}"
+          - "List of all Hosts in current play batch: {{ ansible_play_batch }}"
+          - "Python executable used to invoke Ansible: {{ ansible_playbook_python }}"
           - "Is Ansible run with --check: {{ ansible_check_mode }}"
-          - "Playbook base directory {{ playbook_dir }}"
-          - "Directory name of Ansible’s inventory host file: {{ inventory_dir }}" # Doesn't work if target is localhost
-          - "Filename of Ansible’s inventory host file: {{ inventory_file }}"  # Doesn't work if target is localhost
-          #- "Current role’s pathname: {{ role_path }}"  # only works within a role
+
+          - "Playbook base directory: {{ playbook_dir }}"
+          - "Directory name of Ansible's inventory host file: {{ inventory_dir }}" # Doesn't work if target is localhost
+          - "Filename of Ansible's inventory host file: {{ inventory_file }}"  # Doesn't work if target is localhost
+          #- "Current role's pathname: {{ role_path }}"  # only works within a role
 ...

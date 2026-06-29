@@ -1,0 +1,74 @@
+site_name: Introduction to Ansible
+site_url: https://antari-yan.github.io/Introduction-Ansible/
+repo_url: https://github.com/Antari-yan/Introduction-Ansible
+repo_name: Antari-yan/Introduction-Ansible
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Installation:
+    - Overview: installation/overview.md
+    - Directory Structure: installation/directory-structure.md
+    - SSH Configuration: installation/ssh-configuration.md
+    - Ansible Configuration: installation/ansible-config.md
+    - Test: installation/test.md
+  - Structure:
+    - Inventory: structure/inventory.md
+    - Playbook: structure/playbook.md
+    - Tasks: structure/tasks.md
+    - Handlers: structure/handlers.md
+    - Roles: structure/roles.md
+    - Variables: structure/variables.md
+    - Conditionals & Loops: structure/conditionals-loops.md
+    - Blocks & Error Handling: structure/blocks.md
+    - Templates: structure/templates.md
+    - Vault: structure/vault.md
+  - Practical Tasks:
+    - Tasks: practical_tasks/README.md
+    - Task 1 solution: practical_tasks/solutions/01.md
+    - Task 2 solution: practical_tasks/solutions/02.md
+    - Task 3 solution: practical_tasks/solutions/03.md
+    - Task 4 solution: practical_tasks/solutions/04/04.md
+  - Extras: extras.md
+  - Tips: tips.md

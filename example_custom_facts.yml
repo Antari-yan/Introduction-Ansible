@@ -16,11 +16,11 @@
     - name: Custom facts
       ansible.builtin.debug:
         msg:
-          - "{{ ansible_local.ini_preference.general }}"
-          - "{{ ansible_local.json_preference.general }}"
-          - "{{ ansible_local.python_fact }}"
-          - "{{ ansible_local.date_time }}"
-          - "{{ ansible_local.run_docker_command }}"
+          - "{{ ansible_facts['ansible_local']['ini_preference']['general'] }}"
+          - "{{ ansible_facts['ansible_local']['json_preference']['general'] }}"
+          - "{{ ansible_facts['ansible_local']['python_fact'] }}"
+          - "{{ ansible_facts['ansible_local']['date_time'] }}"
+          - "{{ ansible_facts['ansible_local']['run_docker_command'] }}"
       #delegate_to: ""
       #delegate_facts: true
 ...
